@@ -43,7 +43,34 @@ async function register(req, res){
 }
 
 async function login(req, res){
-    res.send("login")
+    // recuper oi dati inseriti dall utente
+    const {email, password} = req.body;
+    // controllo se l utente esiste
+    const user = await prisma.user.findUnique({
+        where: {
+            email : email
+        }
+    })
+
+    if(!user){
+        throw new Error("Utente non trovato")
+    }
+
+    // controlliamo che la password è corretta
+    const passMatch = await bcrypt.compare(password, user.password);
+
+    if(!passMatch){
+        throw new Error("Invalid password")
+    }
+
+    const token = jwt.sign(user, process.env.JWT_SECRET, {
+        expiresIn: '1h'
+    })
+
+    // elimino la password solo nella vista no nel db
+    delete user.password
+    
+    res.send({user, token})
 
 }
 

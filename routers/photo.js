@@ -6,6 +6,7 @@ const photoController = require("../controllers/photo");
 
 const photoValidationCreate = require("../validations/photoValidationCreate");
 const photoValidationUpdate = require("../validations/photoValidationUpdate");
+const authenticate = require("../middlewares/authenticate");
 
 // GET /photo
 router.get('/', photoController.index);
@@ -14,12 +15,12 @@ router.get('/', photoController.index);
 router.get('/:id', photoController.show);
 
 // POST /photo
-router.post('/', checkSchema(photoValidationCreate), photoController.store);
+router.post('/', authenticate, checkSchema(photoValidationCreate), photoController.store);
 
 // PUT /photo/:id
-router.put('/:id', checkSchema(photoValidationUpdate), photoController.update);
+router.put('/:id', authenticate, checkSchema(photoValidationUpdate), photoController.update);
 
 // DELETE /photo/:id
-router.delete('/:id', photoController.destroy);
+router.delete('/:id', authenticate, photoController.destroy);
 
 module.exports = router
