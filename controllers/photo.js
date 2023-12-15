@@ -27,6 +27,10 @@ async function show(req, res){
         },
     })
 
+    if(!data){
+        res.status(404).send("photo non trovata");
+    }
+
     return res.json(data)
     
 }
