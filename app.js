@@ -4,6 +4,7 @@ const photoRouter = require("./routers/photo");
 const categoriesRouter = require("./routers/categories");
 const errorsFormatterMiddlewares = require("./middlewares/errorsFormatter");
 const notFoundMiddlewares = require("./middlewares/notFound");
+const authRouter = require("./routers/auth")
 
 dotenv.config();
 
@@ -17,6 +18,7 @@ app.use(express.static("public"))
 // ROTTE
 app.use('/photo', photoRouter);
 app.use('/categories', categoriesRouter);
+app.use('', authRouter)
 
 // Middlewares
 app.use(notFoundMiddlewares);
