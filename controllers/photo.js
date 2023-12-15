@@ -1,5 +1,7 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient;
+const {validationResult, matchedData} = require("express-validator");
+
 
 async function index(req, res){
 
@@ -37,7 +39,14 @@ async function show(req, res){
 
 async function store(req, res){
 
-    const datiIngresso = req.body;
+    const validation = validationResult(req);
+
+    if(!validation.isEmpty()){
+        return res.status(422).json(validation.array())
+    }
+
+    const datiIngresso = matchedData(req);
+    // const datiIngresso = req.body;
 
     const newPhoto = await prisma.photo.create({
 
@@ -47,7 +56,7 @@ async function store(req, res){
             image: datiIngresso.image,
             visible: datiIngresso.visible,
             categories: {
-                connect: datiIngresso.category.map(idCategory => ({id: idCategory}))
+                connect: datiIngresso.categories.map(idCategory => ({id: idCategory}))
             }
         },
         include: {
@@ -67,11 +76,29 @@ async function store(req, res){
 async function update(req, res){
 
     const {id} = req.params;
-    const datiIngresso = req.body;
+
+    const validation = validationResult(req);
+
+    if(!validation.isEmpty()){
+        return res.status(422).json(validation.array())
+    }
+
+    const datiIngresso = matchedData(req);
+
+    // const datiIngresso = req.body;
 
     const photoAggiornata = await prisma.photo.update({
 
-        data: datiIngresso,
+        // data: datiIngresso,
+        data:{
+            title: datiIngresso.title,
+            description: datiIngresso.description,
+            image: datiIngresso.image,
+            visible: datiIngresso.visible,
+            categories: {
+                set: datiIngresso.categories.map(idCategory => ({id: idCategory}))
+            }
+        },
         where: {
             id: parseInt(id)
         }
