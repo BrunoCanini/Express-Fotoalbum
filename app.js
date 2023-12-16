@@ -6,14 +6,24 @@ const errorsFormatterMiddlewares = require("./middlewares/errorsFormatter");
 const notFoundMiddlewares = require("./middlewares/notFound");
 const authRouter = require("./routers/auth")
 
+
 dotenv.config();
 
 const app= express();
+
 
 // apllication/json convertiti in un oggetto javascript, accesso tramite req.body
 app.use(express.json());
 // configurazioen file statici
 app.use(express.static("public"))
+
+
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*'); // Consenti l'accesso da qualsiasi origine (*), potresti limitarlo alle origini specifiche
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    next();
+});
 
 // ROTTE
 app.use('/photo', photoRouter);

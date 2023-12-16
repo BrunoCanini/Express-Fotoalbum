@@ -5,7 +5,14 @@ const {validationResult, matchedData} = require("express-validator");
 
 async function index(req, res){
 
+    // console.log(req.query)
+
+    const visible = (req.query.visible ?? "true") === "true"
+
     const data = await prisma.photo.findMany({
+        where:{
+            visible
+        },
         include: {
             categories: {
                 select: {
@@ -27,6 +34,13 @@ async function show(req, res){
         where: {
             id: parseInt(id),
         },
+        include: {
+            categories: {
+                select: {
+                    name: true,
+                }
+            }
+        }
     })
 
     if(!data){
