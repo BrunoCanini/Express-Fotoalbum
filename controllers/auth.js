@@ -14,12 +14,12 @@ async function register(req, res){
     }
 
     const datiIngresso = matchedData(req);
-    console.log(datiIngresso)
+    // console.log(datiIngresso)
 
     // devo criptare la password
     datiIngresso.password = await bcrypt.hash(datiIngresso.password, 10)
 
-    console.log(datiIngresso)
+    // console.log(datiIngresso)
 
     const user = await prisma.user.create({
         data: {
@@ -42,7 +42,7 @@ async function register(req, res){
     res.send({user, token})
 }
 
-async function login(req, res){
+async function login(req, res, next){
     // recuper oi dati inseriti dall utente
     const {email, password} = req.body;
     // controllo se l utente esiste
@@ -60,7 +60,7 @@ async function login(req, res){
     const passMatch = await bcrypt.compare(password, user.password);
 
     if(!passMatch){
-        throw new Error("Invalid password")
+        return next(new Error("Invalid password"))
     }
 
     const token = jwt.sign(user, process.env.JWT_SECRET, {
@@ -74,7 +74,28 @@ async function login(req, res){
 
 }
 
+async function me(req, res){
+
+    const {id} = req.user;
+
+    const user = await prisma.user.findUnique({
+        where: {
+            id,
+        }
+    })
+
+    if(!user){
+        throw new Error("Utente non trovato")
+    }
+
+    delete user.password
+
+    res.json({user});
+
+}
+
 module.exports= {
     register,
-    login
+    login,
+    me
 }
